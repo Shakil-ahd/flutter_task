@@ -16,6 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = await repository.login(event.email, event.password);
         await prefsHelper.saveToken(user.token);
+        await prefsHelper.saveUser(user);
         emit(AuthSuccess(user));
       } catch (e) {
         emit(AuthFailure(e.toString().replaceAll("Exception: ", "")));
@@ -23,24 +24,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<CheckAuthStatus>((event, emit) async {
+      await Future.delayed(const Duration(milliseconds: 50));
+
       final token = await prefsHelper.getToken();
-      if (token != null && token.isNotEmpty) {
-        try {
-          final user = await repository.getCurrentUser();
-          emit(AuthSuccess(user));
-        } catch (e) {
-          await prefsHelper.removeToken();
-          emit(AuthInitial());
-        }
+      final user = await prefsHelper.getUser();
+
+      if (token != null && token.isNotEmpty && user != null) {
+        emit(AuthSuccess(user));
       } else {
-        emit(AuthInitial());
+        emit(AuthUnauthenticated());
       }
     });
 
     on<LogoutRequested>((event, emit) async {
       emit(AuthLoading());
-      await prefsHelper.removeToken();
-      emit(AuthInitial());
+      await prefsHelper.clearAll();
+
+      emit(AuthUnauthenticated());
     });
   }
 }

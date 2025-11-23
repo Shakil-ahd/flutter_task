@@ -5,7 +5,7 @@ import 'post_event.dart';
 import 'post_state.dart';
 
 const _postLimit = 10;
-const _throttleDuration = Duration(milliseconds: 300); // Search throttle
+const _throttleDuration = Duration(milliseconds: 300);
 
 EventTransformer<E> throttleDroppable<E>(Duration duration) {
   return (events, mapper) {
@@ -17,7 +17,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   final ApiRepository repository;
 
   PostBloc({required this.repository}) : super(const PostState()) {
-    on<FetchPosts>(_onFetchPosts); // Normal fetch doesn't need huge throttle
+    on<FetchPosts>(_onFetchPosts);
     on<RefreshPosts>(_onRefreshPosts);
     on<SearchPosts>(
       _onSearchPosts,

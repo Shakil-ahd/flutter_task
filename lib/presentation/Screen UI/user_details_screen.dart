@@ -14,7 +14,7 @@ class UserDetailsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text("Settings")),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthInitial) {
+          if (state is AuthUnauthenticated || state is AuthInitial) {
             Navigator.of(
               context,
             ).pushNamedAndRemoveUntil(AppRouter.login, (route) => false);

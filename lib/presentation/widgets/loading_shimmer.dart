@@ -11,12 +11,12 @@ class PostListShimmer extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
         return Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
+          padding: const EdgeInsets.only(bottom: 12.0),
           child: Shimmer.fromColors(
             baseColor: Colors.grey[300]!,
             highlightColor: Colors.grey[100]!,
             child: Container(
-              height: 120,
+              height: 140,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),

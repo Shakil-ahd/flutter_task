@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../data/models/post_model.dart';
+import 'package:flutter_task/data/models/post_model.dart';
 
 enum PostStatus { initial, success, failure }
 
