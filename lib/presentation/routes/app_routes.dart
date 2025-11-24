@@ -11,10 +11,12 @@ class AppRouter {
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     final Uri uri = Uri.parse(settings.name ?? "");
 
-    if (settings.name == login)
+    if (settings.name == login) {
       return MaterialPageRoute(builder: (_) => const LoginScreen());
-    if (settings.name == home)
+    }
+    if (settings.name == home) {
       return MaterialPageRoute(builder: (_) => const HomeScreen());
+    }
 
     if (uri.path == postDetails && settings.arguments != null) {
       final int id = settings.arguments as int;

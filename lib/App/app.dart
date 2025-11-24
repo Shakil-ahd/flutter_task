@@ -3,10 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_task/data/repositories/api_repository.dart';
 import 'package:flutter_task/logic/auth/bloc/auth_bloc.dart';
 import 'package:flutter_task/logic/auth/bloc/auth_event.dart';
-import 'package:flutter_task/logic/auth/bloc/auth_state.dart';
-import 'package:flutter_task/presentation/Screen%20UI/login_screen.dart';
+import 'package:flutter_task/presentation/Screen%20UI/splash_screen.dart';
 import 'package:flutter_task/presentation/routes/app_routes.dart';
-import '../presentation/Screen UI/home_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -18,22 +16,20 @@ class MyApp extends StatelessWidget {
       child: BlocProvider(
         create: (context) =>
             AuthBloc(repository: context.read<ApiRepository>())
-              ..add(CheckAuthStatus()),
+              ..add(CheckAuthStatus()), // অ্যাপ চালুর সাথে সাথে অথ চেক হবে
 
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Posts App',
-          theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-
-          onGenerateRoute: AppRouter.onGenerateRoute,
-          home: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is AuthSuccess) {
-                return const HomeScreen();
-              }
-              return const LoginScreen();
-            },
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            useMaterial3: true,
+            scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+            fontFamily: 'Roboto', // ফন্ট ফ্যামিলি ডিফাইন করা হলো
           ),
+          onGenerateRoute: AppRouter.onGenerateRoute,
+          // সরাসরি স্প্ল্যাশ স্ক্রিন সেট করা হলো, কোনো কন্ডিশন ছাড়াই
+          home: const SplashScreen(),
         ),
       ),
     );

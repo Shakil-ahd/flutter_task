@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_task/data/services/device_info_services.dart';
 import 'package:flutter_task/logic/auth/bloc/auth_bloc.dart';
 import 'package:flutter_task/logic/auth/bloc/auth_state.dart';
 import 'package:flutter_task/logic/post/bloc/post_bloc.dart';
 import 'package:flutter_task/logic/post/bloc/post_event.dart';
 import 'package:flutter_task/logic/post/bloc/post_state.dart';
-import 'package:flutter_task/presentation/Screen%20UI/user_details_screen.dart';
+import 'package:flutter_task/presentation/Screen%20UI/setting_screen.dart';
 import 'package:flutter_task/presentation/routes/app_routes.dart';
 import '../../data/repositories/api_repository.dart';
 import '../widgets/post_card.dart';
@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _HomeView extends StatefulWidget {
-  const _HomeView({Key? key}) : super(key: key);
+  const _HomeView();
   @override
   State<_HomeView> createState() => _HomeViewState();
 }
@@ -35,7 +35,6 @@ class _HomeView extends StatefulWidget {
 class _HomeViewState extends State<_HomeView> {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
-  static const platform = MethodChannel('com.example.app/device_info');
 
   @override
   void initState() {
@@ -54,45 +53,76 @@ class _HomeViewState extends State<_HomeView> {
     return currentScroll >= (maxScroll * 0.9);
   }
 
-  Future<void> _getDeviceInfo() async {
-    String deviceInfo;
-    try {
-      final String result = await platform.invokeMethod('getDeviceInfo');
-      deviceInfo = result;
-    } on PlatformException catch (e) {
-      deviceInfo = "Failed to get info: '${e.message}'.";
-    }
-
-    if (!mounted) return;
-
-    showDialog(
+  void _showUserDetails(String name, String email, String? image) {
+    showGeneralDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.perm_device_information, color: Colors.blue),
-              SizedBox(width: 10),
-              Text("Device Info"),
-            ],
-          ),
-          content: Text(
-            deviceInfo,
-            style: const TextStyle(fontSize: 16, height: 1.5),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
-                "Close",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+      barrierLabel: 'Dismiss',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) => Container(),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-          ],
+            backgroundColor: Colors.white.withOpacity(0.95),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: (image != null)
+                        ? NetworkImage(image)
+                        : null,
+                    child: (image == null)
+                        ? const Icon(Icons.person, size: 40)
+                        : null,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  email,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE0C3FC).withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    "Verified User",
+                    style: TextStyle(
+                      color: Color(0xFF6A11CB),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -102,10 +132,12 @@ class _HomeViewState extends State<_HomeView> {
   Widget build(BuildContext context) {
     final authState = context.read<AuthBloc>().state;
     String userName = "Guest";
+    String userEmail = "";
     String? userImage;
 
     if (authState is AuthSuccess) {
       userName = "${authState.user.firstName} ${authState.user.lastName}";
+      userEmail = authState.user.email;
       userImage = authState.user.image;
     }
 
@@ -113,12 +145,9 @@ class _HomeViewState extends State<_HomeView> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.fromARGB(255, 149, 175, 3),
-              Color.fromARGB(255, 0, 89, 255),
-            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFa18cd1), Color(0xFFfbc2eb)],
           ),
         ),
         child: Column(
@@ -131,48 +160,65 @@ class _HomeViewState extends State<_HomeView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 22,
-                              backgroundColor: Colors.white.withOpacity(0.3),
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.white,
-                                backgroundImage:
-                                    (userImage != null && userImage.isNotEmpty)
-                                    ? NetworkImage(userImage)
-                                    : null,
-                                child: (userImage == null || userImage.isEmpty)
-                                    ? const Icon(
-                                        Icons.person,
-                                        color: Colors.grey,
-                                      )
-                                    : null,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Welcome back,",
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  userName,
-                                  style: const TextStyle(
+                        GestureDetector(
+                          onTap: () =>
+                              _showUserDetails(userName, userEmail, userImage),
+                          child: Row(
+                            children: [
+                              Hero(
+                                tag: 'userProfile',
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
                                     color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 5,
+                                      ),
+                                    ],
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 22,
+                                    backgroundImage: (userImage != null)
+                                        ? NetworkImage(userImage)
+                                        : null,
+                                    child: (userImage == null)
+                                        ? const Icon(Icons.person)
+                                        : null,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Welcome,",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    userName,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black26,
+                                          blurRadius: 2,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         Container(
                           decoration: BoxDecoration(
@@ -187,7 +233,7 @@ class _HomeViewState extends State<_HomeView> {
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const UserDetailsScreen(),
+                                builder: (_) => const SettingScreen(),
                               ),
                             ),
                           ),
@@ -195,23 +241,22 @@ class _HomeViewState extends State<_HomeView> {
                       ],
                     ),
                     const SizedBox(height: 20),
-
                     TextField(
                       controller: _searchController,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: "Search posts...",
+                        hintText: "What are you looking for?",
                         hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withOpacity(0.7),
                         ),
-                        fillColor: Colors.white.withOpacity(0.2),
+                        fillColor: Colors.white.withOpacity(0.25),
                         filled: true,
                         prefixIcon: const Icon(
                           Icons.search,
-                          color: Colors.white70,
+                          color: Colors.white,
                         ),
                         suffixIcon: IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.white70),
+                          icon: const Icon(Icons.clear, color: Colors.white),
                           onPressed: () {
                             _searchController.clear();
                             context.read<PostBloc>().add(SearchPosts(""));
@@ -252,19 +297,14 @@ class _HomeViewState extends State<_HomeView> {
                     builder: (context, state) {
                       if (state.status == PostStatus.initial &&
                           state.posts.isEmpty) {
-                        return const Padding(
-                          padding: EdgeInsets.only(top: 20),
-                          child: PostListShimmer(),
-                        );
+                        return const PostListShimmer();
                       }
-
                       if (state.status == PostStatus.failure &&
                           state.posts.isEmpty) {
                         return Center(
                           child: Text("Error: ${state.errorMessage}"),
                         );
                       }
-
                       if (state.status == PostStatus.success &&
                           state.posts.isEmpty) {
                         return const Center(child: Text("No posts found"));
@@ -275,8 +315,7 @@ class _HomeViewState extends State<_HomeView> {
                           context.read<PostBloc>().add(RefreshPosts());
                           await Future.delayed(const Duration(seconds: 1));
                         },
-                        color: const Color.fromARGB(255, 0, 89, 255),
-                        backgroundColor: Colors.white,
+                        color: const Color(0xFF8E2DE2),
                         child: ListView.builder(
                           controller: _scrollController,
                           padding: const EdgeInsets.only(
@@ -290,40 +329,21 @@ class _HomeViewState extends State<_HomeView> {
                               : state.posts.length + 1,
                           itemBuilder: (context, index) {
                             if (index >= state.posts.length) {
-                              return Center(
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    vertical: 20,
-                                  ),
-                                  padding: const EdgeInsets.all(10),
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        blurRadius: 10,
-                                      ),
-                                    ],
-                                  ),
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                  ),
+                              return const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: CircularProgressIndicator(),
                                 ),
                               );
                             }
                             final post = state.posts[index];
                             return PostCard(
                               post: post,
-                              onTap: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  AppRouter.postDetails,
-                                  arguments: post.id,
-                                );
-                              },
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                AppRouter.postDetails,
+                                arguments: post.id,
+                              ),
                             );
                           },
                         ),
@@ -336,9 +356,10 @@ class _HomeViewState extends State<_HomeView> {
           ],
         ),
       ),
+
       floatingActionButton: FloatingActionButton(
-        onPressed: _getDeviceInfo,
-        backgroundColor: const Color.fromARGB(255, 0, 89, 255),
+        onPressed: () => DeviceInfoService.showDeviceInfo(context),
+        backgroundColor: const Color(0xFF8E2DE2),
         child: const Icon(Icons.info_outline, color: Colors.white),
       ),
     );
