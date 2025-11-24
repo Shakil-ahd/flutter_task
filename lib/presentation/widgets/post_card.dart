@@ -44,16 +44,15 @@ class _PostCardState extends State<PostCard>
         return Transform.scale(scale: _scaleAnimation.value, child: child);
       },
       child: GestureDetector(
-        onTapDown: (_) => _controller.forward(), // টাচ করলে ছোট হবে
+        onTapDown: (_) => _controller.forward(),
         onTapUp: (_) {
-          _controller.reverse(); // ছেড়ে দিলে আগের অবস্থায় ফিরবে
-          widget.onTap(); // একশন কল হবে
+          _controller.reverse();
+          widget.onTap();
         },
         onTapCancel: () => _controller.reverse(),
         child: Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            // Glassmorphism Style Background
             color: Colors.white.withOpacity(0.7),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.white.withOpacity(0.6), width: 1),
@@ -70,7 +69,6 @@ class _PostCardState extends State<PostCard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Tags with Gradient Style
                 if (widget.post.tags.isNotEmpty)
                   Wrap(
                     spacing: 8,
@@ -108,7 +106,6 @@ class _PostCardState extends State<PostCard>
                   ),
                 const SizedBox(height: 12),
 
-                // Title
                 Text(
                   widget.post.title,
                   style: TextStyle(
@@ -122,7 +119,6 @@ class _PostCardState extends State<PostCard>
                 ),
                 const SizedBox(height: 8),
 
-                // Body
                 Text(
                   widget.post.body,
                   style: TextStyle(
@@ -135,7 +131,6 @@ class _PostCardState extends State<PostCard>
                 ),
                 const SizedBox(height: 16),
 
-                // Footer Info
                 Container(
                   padding: const EdgeInsets.symmetric(
                     vertical: 8,

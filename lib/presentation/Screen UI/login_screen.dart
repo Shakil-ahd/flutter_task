@@ -38,10 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color.fromARGB(255, 149, 175, 3),
-              Color.fromARGB(255, 0, 89, 255),
-            ],
+            colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
           ),
         ),
         child: BlocConsumer<AuthBloc, AuthState>(

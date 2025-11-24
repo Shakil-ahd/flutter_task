@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen>
       setState(() {
         _isAnimationDone = true;
       });
-      // অ্যানিমেশন শেষ হলে বর্তমান স্টেট অনুযায়ী নেভিগেট করবে
+
       _checkAndNavigate(context.read<AuthBloc>().state);
     });
   }
@@ -78,14 +78,10 @@ class _SplashScreenState extends State<SplashScreen>
         body: Container(
           width: double.infinity,
           decoration: const BoxDecoration(
-            // সুন্দর মাল্টিকালার গ্রেডিয়েন্ট
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF8E2DE2), // Purple
-                Color(0xFF4A00E0), // Deep Blue
-              ],
+              colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
             ),
           ),
           child: Column(
@@ -110,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ],
                   ),
-                  child: const AppLogo(size: 100), // কাস্টম লোগো
+                  child: const AppLogo(size: 100),
                 ),
               ),
               const SizedBox(height: 40),

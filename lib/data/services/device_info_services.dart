@@ -6,7 +6,15 @@ class DeviceInfoService {
     'com.example.app/device_info',
   );
 
-  // platform call
+  static void initDeepLinkListener() {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == "onDeepLink") {
+        final uri = call.arguments as String;
+        debugPrint("Received deep link: $uri");
+      }
+    });
+  }
+
   static Future<String> getDeviceInfo() async {
     try {
       final String result = await _channel.invokeMethod('getDeviceInfo');
@@ -16,7 +24,6 @@ class DeviceInfoService {
     }
   }
 
-  // Beautiful Dialog
   static Future<void> showDeviceInfo(BuildContext context) async {
     final deviceInfo = await getDeviceInfo();
     if (!context.mounted) return;
@@ -43,7 +50,6 @@ class DeviceInfoService {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Icon top
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
@@ -56,18 +62,12 @@ class DeviceInfoService {
                   color: Colors.blue,
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Title
               const Text(
                 "Device Information",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
-
               const SizedBox(height: 12),
-
-              // Info text
               Text(
                 deviceInfo,
                 textAlign: TextAlign.center,
@@ -77,10 +77,7 @@ class DeviceInfoService {
                   height: 1.4,
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // OK Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

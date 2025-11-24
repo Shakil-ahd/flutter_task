@@ -9,7 +9,6 @@ class ApiRepository {
   final String baseUrl = "https://dummyjson.com";
   final SharedPrefsHelper _prefsHelper = SharedPrefsHelper();
 
-  // --- Auth ---
   Future<UserModel> login(String username, String password) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/login'),
@@ -17,14 +16,13 @@ class ApiRepository {
       body: jsonEncode({
         'username': username,
         'password': password,
-        'expiresInMins': 60, // Token expiration time
+        'expiresInMins': 60,
       }),
     );
 
     if (response.statusCode == 200) {
       return UserModel.fromJson(jsonDecode(response.body));
     } else {
-      // Error handling based on API response
       final errorBody = jsonDecode(response.body);
       throw Exception(errorBody['message'] ?? 'Login Failed');
     }
@@ -41,15 +39,13 @@ class ApiRepository {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      data['token'] =
-          token; // API doesn't return token in /me, so we attach existing one
+      data['token'] = token;
       return UserModel.fromJson(data);
     } else {
       throw Exception('Failed to fetch user info');
     }
   }
 
-  // --- Posts ---
   Future<List<PostModel>> getPosts({
     int limit = 10,
     int skip = 0,

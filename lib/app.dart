@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       child: BlocProvider(
         create: (context) =>
             AuthBloc(repository: context.read<ApiRepository>())
-              ..add(CheckAuthStatus()), // অ্যাপ চালুর সাথে সাথে অথ চেক হবে
+              ..add(CheckAuthStatus()),
 
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -25,10 +25,10 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
             useMaterial3: true,
             scaffoldBackgroundColor: const Color(0xFFF5F7FA),
-            fontFamily: 'Roboto', // ফন্ট ফ্যামিলি ডিফাইন করা হলো
+            fontFamily: 'Roboto',
           ),
           onGenerateRoute: AppRouter.onGenerateRoute,
-          // সরাসরি স্প্ল্যাশ স্ক্রিন সেট করা হলো, কোনো কন্ডিশন ছাড়াই
+
           home: const SplashScreen(),
         ),
       ),

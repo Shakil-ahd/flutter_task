@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_task/data/models/users_model.dart';
 import 'package:flutter_task/data/services/device_info_services.dart';
 import 'package:flutter_task/logic/auth/bloc/auth_bloc.dart';
 import 'package:flutter_task/logic/auth/bloc/auth_state.dart';
@@ -53,70 +54,112 @@ class _HomeViewState extends State<_HomeView> {
     return currentScroll >= (maxScroll * 0.9);
   }
 
-  void _showUserDetails(String name, String email, String? image) {
+  void _showUserDetails(UserModel user) {
     showGeneralDialog(
       context: context,
-      barrierDismissible: true,
+
+      barrierDismissible: false,
       barrierLabel: 'Dismiss',
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, animation, secondaryAnimation) => Container(),
       transitionBuilder: (context, animation, secondaryAnimation, child) {
         return ScaleTransition(
           scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-          child: AlertDialog(
+          child: Dialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            backgroundColor: Colors.white.withOpacity(0.95),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
+            elevation: 10,
+            backgroundColor: Colors.transparent,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundImage: (image != null)
-                        ? NetworkImage(image)
-                        : null,
-                    child: (image == null)
-                        ? const Icon(Icons.person, size: 40)
-                        : null,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  email,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE0C3FC).withOpacity(0.3),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    "Verified User",
-                    style: TextStyle(
-                      color: Color(0xFF6A11CB),
-                      fontWeight: FontWeight.bold,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 10),
+
+                      _buildDetailRow(
+                        "Name",
+                        "${user.firstName} ${user.lastName}",
+                      ),
+                      const Divider(),
+                      _buildDetailRow("Email", user.email),
+                      const Divider(),
+                      _buildDetailRow("Gender", user.gender.toUpperCase()),
+
+                      if (user.phone != null) ...[
+                        const Divider(),
+                        _buildDetailRow("Phone", user.phone!),
+                      ],
+                      if (user.city != null) ...[
+                        const Divider(),
+                        _buildDetailRow("City", user.city!),
+                      ],
+
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+
+                Positioned(
+                  top: -50,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white,
+                      backgroundImage: (user.image.isNotEmpty)
+                          ? NetworkImage(user.image)
+                          : null,
+                      child: (user.image.isEmpty)
+                          ? const Icon(
+                              Icons.person,
+                              size: 50,
+                              color: Colors.grey,
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: InkWell(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ),
@@ -128,17 +171,69 @@ class _HomeViewState extends State<_HomeView> {
     );
   }
 
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(
+              "$label :",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF4A00E0),
+                fontSize: 15,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: const Color(0xFF4A00E0)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = context.read<AuthBloc>().state;
-    String userName = "Guest";
-    String userEmail = "";
-    String? userImage;
+    UserModel? currentUser;
 
     if (authState is AuthSuccess) {
-      userName = "${authState.user.firstName} ${authState.user.lastName}";
-      userEmail = authState.user.email;
-      userImage = authState.user.image;
+      currentUser = authState.user;
     }
 
     return Scaffold(
@@ -147,7 +242,7 @@ class _HomeViewState extends State<_HomeView> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFa18cd1), Color(0xFFfbc2eb)],
+            colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
           ),
         ),
         child: Column(
@@ -161,8 +256,11 @@ class _HomeViewState extends State<_HomeView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         GestureDetector(
-                          onTap: () =>
-                              _showUserDetails(userName, userEmail, userImage),
+                          onTap: () {
+                            if (currentUser != null) {
+                              _showUserDetails(currentUser);
+                            }
+                          },
                           child: Row(
                             children: [
                               Hero(
@@ -181,10 +279,14 @@ class _HomeViewState extends State<_HomeView> {
                                   ),
                                   child: CircleAvatar(
                                     radius: 22,
-                                    backgroundImage: (userImage != null)
-                                        ? NetworkImage(userImage)
+                                    backgroundImage:
+                                        (currentUser?.image != null &&
+                                            currentUser!.image.isNotEmpty)
+                                        ? NetworkImage(currentUser.image)
                                         : null,
-                                    child: (userImage == null)
+                                    child:
+                                        (currentUser?.image == null ||
+                                            currentUser!.image.isEmpty)
                                         ? const Icon(Icons.person)
                                         : null,
                                   ),
@@ -202,7 +304,9 @@ class _HomeViewState extends State<_HomeView> {
                                     ),
                                   ),
                                   Text(
-                                    userName,
+                                    currentUser != null
+                                        ? "${currentUser.firstName} ${currentUser.lastName}"
+                                        : "Guest",
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
@@ -244,6 +348,9 @@ class _HomeViewState extends State<_HomeView> {
                     TextField(
                       controller: _searchController,
                       style: const TextStyle(color: Colors.white),
+                      onTapOutside: (event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
                       decoration: InputDecoration(
                         hintText: "What are you looking for?",
                         hintStyle: TextStyle(
@@ -260,6 +367,7 @@ class _HomeViewState extends State<_HomeView> {
                           onPressed: () {
                             _searchController.clear();
                             context.read<PostBloc>().add(SearchPosts(""));
+                            FocusManager.instance.primaryFocus?.unfocus();
                           },
                         ),
                         border: OutlineInputBorder(

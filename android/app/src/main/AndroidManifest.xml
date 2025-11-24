@@ -1,13 +1,16 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.flutter_task">
+
     <application
         android:label="flutter_task"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        
+        
         <activity
-            android:name=".MainActivity"
+            android:name=".MainActivity" 
             android:exported="true"
             android:launchMode="singleTask"
-            android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
@@ -18,35 +21,33 @@
               android:resource="@style/NormalTheme"
               />
             
-            <!-- 1. Default Launcher Intent -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <!-- 2. Custom Scheme Deep Link (myapp://posts/1) -->
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts uris like "myapp://posts/1" -->
                 <data android:scheme="myapp" android:host="posts" />
             </intent-filter>
 
-            <!-- 3. Web URL Deep Link (https://yourapp.com/posts/1) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts uris like "https://yourapp.com/posts/1" -->
                 <data android:scheme="https" android:host="yourapp.com" android:pathPrefix="/posts" />
             </intent-filter>
 
         </activity>
+        
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
