@@ -11,11 +11,11 @@ class HomeHeader extends StatelessWidget {
   final VoidCallback onProfileTap;
 
   const HomeHeader({
-    Key? key,
+    super.key,
     required this.user,
     required this.searchController,
     required this.onProfileTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
