@@ -104,7 +104,7 @@ Contains:
 ✔ Deep link test  
 ✔ FAB → Native device info dialog  
 
-👉 **[Watch Demo Video](https://drive.google.com/file/d/1LpoC6LSKqg2YW1JaC3tU5SYWVTjo0N1g/view?usp=sharing)**
+👉 **[Watch Screen Recorded Video](https://drive.google.com/file/d/1LpoC6LSKqg2YW1JaC3tU5SYWVTjo0N1g/view?usp=sharing)**
 
 ---
 
