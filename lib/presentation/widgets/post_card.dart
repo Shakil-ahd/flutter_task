@@ -5,8 +5,7 @@ class PostCard extends StatefulWidget {
   final PostModel post;
   final VoidCallback onTap;
 
-  const PostCard({Key? key, required this.post, required this.onTap})
-    : super(key: key);
+  const PostCard({super.key, required this.post, required this.onTap});
 
   @override
   State<PostCard> createState() => _PostCardState();
